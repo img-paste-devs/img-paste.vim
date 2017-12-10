@@ -1,4 +1,4 @@
-function! MarkdownClipboardImage() abort
+function! MarkdownClipboardImageLinux() abort
   let targets = filter(
         \ systemlist('xclip -selection clipboard -t TARGETS -o'),
         \ 'v:val =~# ''image''')
@@ -33,8 +33,7 @@ function! MarkdownClipboardImage() abort
     call rename(tmpfile, filename)
   endif
 
-  let @* = '![](' . fnamemodify(relpath , ':.') . ')'
-  normal! "*p
+  execute "normal! i![](" . rel_path . ")"
 endfunction
 "
 " ---------------------------MacOS-version---------------------------------------
@@ -63,9 +62,16 @@ function! MarkdownClipboardImageMacOS() abort
 
   silent call system(clip_command)
   if v:shell_error == 1
-    normal! p
+    return
   else
-    execute "normal! i![](" . file_path . ")"
+    execute "normal! i![](" . rel_path . ")"
   endif
 endfunction
 
+function! mdip#MarkdownClipboardImage()
+  if has('mac')
+    call MarkdownClipboardImageMacOS()
+  else
+    call MarkdownClipboardImageLinux()
+  endif
+endfunction
