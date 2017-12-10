@@ -39,7 +39,7 @@ endfunction
 "
 " ---------------------------MacOS-version---------------------------------------
 "
-function! MarkdownClipboardImage() abort
+function! MarkdownClipboardImageMacOS() abort
   " Create `img` directory if it doesn't exist
   let img_dir = expand('%:p:h') . '/img'
   if !isdirectory(img_dir)
