@@ -1,77 +1,83 @@
-function! MarkdownClipboardImageLinux() abort
-  let targets = filter(
-        \ systemlist('xclip -selection clipboard -t TARGETS -o'),
-        \ 'v:val =~# ''image''')
-  if empty(targets) | return | endif
-
-  let outdir = expand('%:p:h') . '/img'
-  if !isdirectory(outdir)
-    call mkdir(outdir)
-  endif
-
-  let mimetype = targets[0]
-  let extension = split(mimetype, '/')[-1]
-  let tmpfile = outdir . '/savefile_tmp.' . extension
-  call system(printf('xclip -selection clipboard -t %s -o > %s',
-        \ mimetype, tmpfile))
-
-  let cnt = 0
-  let filename = outdir . '/image' . cnt . '.' . extension
-  while filereadable(filename)
-    call system('diff ' . tmpfile . ' ' . filename)
-    if !v:shell_error
-      call delete(tmpfile)
-      break
-    endif
-
-    let cnt += 1
-    let filename = outdir . '/image' . cnt . '.' . extension
-    let relpath = 'img/image' . cnt . '.' . extention
-  endwhile
-
-  if filereadable(tmpfile)
-    call rename(tmpfile, filename)
-  endif
-
-  execute "normal! i![](" . rel_path . ")"
+function! SafeMakeDir()
+    let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
+        if !isdirectory(outdir)
+            call mkdir(outdir)
+        endif
+    return outdir
 endfunction
-"
-" ---------------------------MacOS-version---------------------------------------
-"
-function! MarkdownClipboardImageMacOS() abort
-  " Create `img` directory if it doesn't exist
-  let img_dir = expand('%:p:h') . '/img'
-  if !isdirectory(img_dir)
-    silent call mkdir(img_dir)
-  endif
 
-  " First find out what filename to use
-  let index = 1
-  let file_path = img_dir . "/image" . index . ".png"
-  while filereadable(file_path)
-    let index = index + 1
-    let file_path = img_dir . "/image" . index . ".png"
-    let rel_path = "img/image" . index . ".png"
-  endwhile
+function! SaveFileTMPLinux(imgdir, tmpname) abort
+    let targets = filter(
+            \ systemlist('xclip -selection clipboard -t TARGETS -o'),
+            \ 'v:val =~# ''image''')
+      if empty(targets) | return 1 | endif
+      
+      let mimetype = targets[0]
+      let extension = split(mimetype, '/')[-1]
+      let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
+      call system(printf('xclip -selection clipboard -t %s -o > %s',
+            \ mimetype, tmpfile))
+      return tmpfile
+endfunction
 
-  let clip_command = 'osascript'
-  let clip_command .= ' -e "set png_data to the clipboard as «class PNGf»"'
-  let clip_command .= ' -e "set referenceNumber to open for access POSIX path of'
-  let clip_command .= ' (POSIX file \"' . file_path . '\") with write permission"'
-  let clip_command .= ' -e "write png_data to referenceNumber"'
+function! SaveFileTMPMacOS(imgdir, tmpname) abort
+    let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
+    let clip_command = 'osascript'
+    let clip_command .= ' -e "set png_data to the clipboard as «class PNGf»"'
+    let clip_command .= ' -e "set referenceNumber to open for access POSIX path of'
+    let clip_command .= ' (POSIX file \"' . tmpfile . '\") with write permission"'
+    let clip_command .= ' -e "write png_data to referenceNumber"'
 
-  silent call system(clip_command)
-  if v:shell_error == 1
-    return
-  else
-    execute "normal! i![](" . rel_path . ")"
-  endif
+    silent call system(clip_command)
+    if v:shell_error == 1
+        return 1
+    else
+        return tmpfile
+    endif
+endfunction
+
+function! SaveFileTMP(imgdir, tmpname)
+    if has('mac')
+        return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+    else
+        return SaveFileTMPLinux(a:imgdir, a:tmpname)
+    endif
+endfunction
+
+function! SaveNewFile(imgdir, tmpfile)
+    let extension = split(a:tmpfile, '\.')[-1]
+    let reldir = g:mdip_imgdir
+    let cnt = 0
+    let filename = a:imgdir . '/' . g:mdip_imgname . cnt . '.' . extension
+    let relpath = reldir . '/' . g:mdip_imgname . cnt . '.' . extension
+    while filereadable(filename)
+        call system('diff ' . a:tmpfile . ' ' . filename)
+        if !v:shell_error
+            call delete(a:tmpfile)
+            return relpath
+        endif
+        let cnt += 1
+        let filename = a:imgdir . '/' . g:mdip_imgname . cnt . '.' . extension
+        let relpath = reldir . '/' . g:mdip_imgname . cnt . '.' . extension
+    endwhile
+    if filereadable(a:tmpfile)
+        call rename(a:tmpfile, filename)
+    endif
+    return relpath
 endfunction
 
 function! mdip#MarkdownClipboardImage()
-  if has('mac')
-    call MarkdownClipboardImageMacOS()
-  else
-    call MarkdownClipboardImageLinux()
-  endif
+    let workdir = SafeMakeDir()
+    let tmpfile = SaveFileTMP(workdir, g:mdip_tmpname)
+    if tmpfile == 1
+        return
+    else
+        let relpath = SaveNewFile(g:mdip_imgdir, tmpfile)
+        execute "normal! i![](" . relpath . ")"
+    endif
 endfunction
+
+let g:mdip_imgdir = 'img'
+let g:mdip_tmpname = 'tmp'
+let g:mdip_imgname = 'image'
+
