@@ -11,7 +11,7 @@ function! SaveFileTMPLinux(imgdir, tmpname) abort
             \ systemlist('xclip -selection clipboard -t TARGETS -o'),
             \ 'v:val =~# ''image''')
       if empty(targets) | return 1 | endif
-      
+
       let mimetype = targets[0]
       let extension = split(mimetype, '/')[-1]
       let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
@@ -77,7 +77,13 @@ function! mdip#MarkdownClipboardImage()
     endif
 endfunction
 
-let g:mdip_imgdir = 'img'
-let g:mdip_tmpname = 'tmp'
-let g:mdip_imgname = 'image'
+if !exists('g:mdip_imgdir')
+    let g:mdip_imgdir = 'img'
+endif
+if !exists('g:mdip_tmpname')
+    let g:mdip_tmpname = 'tmp'
+endif
+if !exists('g:mdip_imgname')
+    let g:mdip_imgname = 'image'
+endif
 
