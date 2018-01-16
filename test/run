@@ -1,0 +1,10 @@
+#!/bin/bash
+
+VIM="${VIM:-'vim'}"
+rm -rf img out.md
+source load_clipboard_macos
+add-to-clipboard Doge.png
+VIM -c "call mdip#MarkdownClipboardImage()|wq" out.md
+[[ $(compare -identify -metric MAE Doge.png img/image0.png /dev/null 2>&1 | grep "^\d" | cut -b 1-2) == '0 ' ]] && echo '>> image is successfully copied' || echo '>> wrong behaviour, file is not copied or wrong'
+rm -rf img out.md
+

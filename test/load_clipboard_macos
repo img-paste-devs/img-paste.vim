@@ -1,0 +1,8 @@
+add-to-clipboard () {
+    osascript - "$@" <<'END' 2> /dev/null
+on run {a}
+set the clipboard to (read POSIX file (POSIX path of ((POSIX file a) as alias)) as JPEG picture)
+end
+END
+}
+
