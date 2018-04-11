@@ -67,7 +67,7 @@ function! SaveNewFile(imgdir, tmpfile)
 endfunction
 
 function! RandomName()
-  let l:new_random = system('echo $(date +\%s)-$RANDOM')
+  let l:new_random = system('echo $(date +\%s)-$RANDOM')[0:-2]
   return l:new_random
 endfunction
 
