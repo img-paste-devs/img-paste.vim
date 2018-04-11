@@ -66,13 +66,24 @@ function! SaveNewFile(imgdir, tmpfile)
     return relpath
 endfunction
 
+function! RandomName()
+  let l:new_random = system('echo $(date +\%s)-$RANDOM')
+  return l:new_random
+endfunction
+
 function! mdip#MarkdownClipboardImage()
     let workdir = SafeMakeDir()
+    " change temp-file-name and image-name
+    let g:mdip_tmpname = RandomName()
+    " let g:mdip_imgname = g:mdip_tmpname
+    
     let tmpfile = SaveFileTMP(workdir, g:mdip_tmpname)
     if tmpfile == 1
         return
     else
-        let relpath = SaveNewFile(g:mdip_imgdir, tmpfile)
+        " let relpath = SaveNewFile(g:mdip_imgdir, tmpfile)
+        let extension = split(tmpfile, '\.')[-1]
+        let relpath = g:mdip_imgdir . '/' . g:mdip_tmpname . '.' . extension
         execute "normal! i![](" . relpath . ")"
     endif
 endfunction
