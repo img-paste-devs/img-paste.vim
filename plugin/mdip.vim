@@ -36,12 +36,32 @@ function! SaveFileTMPMacOS(imgdir, tmpname) abort
     endif
 endfunction
 
+function! SaveFileTMPWindows(imgdir, tmpname) abort
+  let script_path=$HOME."\\vimfiles\\bundle\\md-img-paste.vim\\plugin\\"
+  let script_call="save_image_from_clipboard_to_file.ps1 -directory " . a:imgdir
+  let execute_script = "powershell.exe -executionpolicy remotesigned -File " . script_path.script_call
+  let tmpfile = system(expand(execute_script))
+
+  if !tmpfile
+    " Override filename if tmpfile exists
+    let file_name = split(tmpfile, '\\')[-1]
+    let g:mdip_tmpname = split(file_name, '\.')[-2]
+    let tmpfile=tmpfile[:-2]
+    echo "LA:" tmpfile
+  endif
+
+  return tmpfile
+endfunction
+
 function! SaveFileTMP(imgdir, tmpname)
-    if has('mac')
-        return SaveFileTMPMacOS(a:imgdir, a:tmpname)
-    else
-        return SaveFileTMPLinux(a:imgdir, a:tmpname)
-    endif
+  if has('win16') || has('win95') || has('win32') || has('win64')
+    return SaveFileTMPWindows(a:imgdir, a:tmpname)
+  endif
+  if has('mac')
+    return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+  else 
+    return SaveFileTMPLinux(a:imgdir, a:tmpname)
+  endif
 endfunction
 
 function! SaveNewFile(imgdir, tmpfile)
@@ -67,6 +87,9 @@ function! SaveNewFile(imgdir, tmpfile)
 endfunction
 
 function! RandomName()
+  if has('win16') || has('win95') || has('win32') || has('win64')
+    return
+  endif
   let l:new_random = system('echo $(date +\%s)-$RANDOM')[0:-2]
   return l:new_random
 endfunction
@@ -85,6 +108,7 @@ function! mdip#MarkdownClipboardImage()
         let extension = split(tmpfile, '\.')[-1]
         let relpath = g:mdip_imgdir . '/' . g:mdip_tmpname . '.' . extension
         execute "normal! i![](" . relpath . ")"
+        "execute "normal! i\\includegraphics[scale=0.25]{" . relpath . "}"
     endif
 endfunction
 
