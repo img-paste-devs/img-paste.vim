@@ -76,7 +76,7 @@ function! mdip#MarkdownClipboardImage()
     " change temp-file-name and image-name
     let g:mdip_tmpname = RandomName()
     " let g:mdip_imgname = g:mdip_tmpname
-    
+
     let tmpfile = SaveFileTMP(workdir, g:mdip_tmpname)
     if tmpfile == 1
         return
@@ -84,7 +84,7 @@ function! mdip#MarkdownClipboardImage()
         " let relpath = SaveNewFile(g:mdip_imgdir, tmpfile)
         let extension = split(tmpfile, '\.')[-1]
         let relpath = g:mdip_imgdir . '/' . g:mdip_tmpname . '.' . extension
-        execute "normal! i![](" . relpath . ")"
+        execute "normal! i![Image](" . relpath . ")"
     endif
 endfunction
 
@@ -97,4 +97,3 @@ endif
 if !exists('g:mdip_imgname')
     let g:mdip_imgname = 'image'
 endif
-
