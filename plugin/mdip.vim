@@ -3,7 +3,7 @@ function! SafeMakeDir()
         if !isdirectory(outdir)
             call mkdir(outdir)
         endif
-    return outdir
+    return fnameescape(outdir)
 endfunction
 
 function! SaveFileTMPLinux(imgdir, tmpname) abort
