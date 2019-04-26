@@ -1,24 +1,47 @@
 function! SafeMakeDir()
-    let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
-        if !isdirectory(outdir)
-            call mkdir(outdir)
-        endif
+    if has('win32')
+        let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
+    else    
+        let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
+    endif
+    if !isdirectory(outdir)
+        call mkdir(outdir)
+    endif
     return fnameescape(outdir)
 endfunction
 
 function! SaveFileTMPLinux(imgdir, tmpname) abort
     let targets = filter(
-            \ systemlist('xclip -selection clipboard -t TARGETS -o'),
-            \ 'v:val =~# ''image''')
-      if empty(targets) | return 1 | endif
+                \ systemlist('xclip -selection clipboard -t TARGETS -o'),
+                \ 'v:val =~# ''image''')
+    if empty(targets) | return 1 | endif
 
-      let mimetype = targets[0]
-      let extension = split(mimetype, '/')[-1]
-      let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
-      call system(printf('xclip -selection clipboard -t %s -o > %s',
-            \ mimetype, tmpfile))
-      return tmpfile
+    let mimetype = targets[0]
+    let extension = split(mimetype, '/')[-1]
+    let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
+    call system(printf('xclip -selection clipboard -t %s -o > %s',
+                \ mimetype, tmpfile))
+    return tmpfile
 endfunction
+
+function! SaveFileTMPWin32(imgdir, tmpname) abort
+    let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
+
+    let clip_command = "Add-Type -AssemblyName System.Windows.Forms;"
+    let clip_command .= "if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {"
+    let clip_command .= "[System.Drawing.Bitmap][System.Windows.Forms.Clipboard]::GetDataObject().getimage().Save('"
+    let clip_command .= tmpfile ."', [System.Drawing.Imaging.ImageFormat]::Png) }"
+    let clip_command = "powershell -sta \"".clip_command. "\""
+
+    silent call system(clip_command)
+    if v:shell_error == 1
+        return 1
+    else
+        return tmpfile
+    endif
+endfunction
+
+
 
 function! SaveFileTMPMacOS(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
@@ -39,6 +62,8 @@ endfunction
 function! SaveFileTMP(imgdir, tmpname)
     if has('mac')
         return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+    elseif has('win32')
+        return SaveFileTMPWin32(a:imgdir, a:tmpname)
     else
         return SaveFileTMPLinux(a:imgdir, a:tmpname)
     endif
@@ -67,8 +92,8 @@ function! SaveNewFile(imgdir, tmpfile)
 endfunction
 
 function! RandomName()
-  let l:new_random = system('echo $(date +\%s)-$RANDOM')[0:-2]
-  return l:new_random
+    let l:new_random = strftime("%Y-%m-%d-%H:%M")
+    return l:new_random
 endfunction
 
 function! mdip#MarkdownClipboardImage()
