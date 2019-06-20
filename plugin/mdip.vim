@@ -60,8 +60,12 @@ function! SaveFileTMPMacOS(imgdir, tmpname) abort
 endfunction
 
 function! SaveFileTMP(imgdir, tmpname)
-    if has('mac')
-        return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+    if has('unix')
+      "from mac https://superuser.com/a/193638/15231
+        let s:uname = system("uname")
+            if s:uname == "Darwin\n"
+                return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+        endif
     elseif has('win32')
         return SaveFileTMPWin32(a:imgdir, a:tmpname)
     else
