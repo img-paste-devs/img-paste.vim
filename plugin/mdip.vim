@@ -60,16 +60,17 @@ function! SaveFileTMPMacOS(imgdir, tmpname) abort
 endfunction
 
 function! SaveFileTMP(imgdir, tmpname)
-    if has('unix')
-      "from mac https://superuser.com/a/193638/15231
-        let s:uname = system("uname")
-            if s:uname == "Darwin\n"
-                return SaveFileTMPMacOS(a:imgdir, a:tmpname)
-        endif
-    elseif has('win32')
-        return SaveFileTMPWin32(a:imgdir, a:tmpname)
-    else
+    " detect os: https://vi.stackexchange.com/questions/2572/detect-os-in-vimscript
+    let os = "Windows"
+    if !(has("win64") || has("win32") || has("win16"))
+        let os = substitute(system('uname'), '\n', '', '')
+    endif
+    if os == "Darwin"
+        return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+    elseif os == "Linux"
         return SaveFileTMPLinux(a:imgdir, a:tmpname)
+    elseif os == "Windows"
+        return SaveFileTMPWin32(a:imgdir, a:tmpname)
     endif
 endfunction
 
