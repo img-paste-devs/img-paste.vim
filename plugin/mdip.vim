@@ -1,5 +1,5 @@
 function! SafeMakeDir()
-    if has('win32')
+    if s:os == "Windows"
         let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
     else
         let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
@@ -60,16 +60,11 @@ function! SaveFileTMPMacOS(imgdir, tmpname) abort
 endfunction
 
 function! SaveFileTMP(imgdir, tmpname)
-    " detect os: https://vi.stackexchange.com/questions/2572/detect-os-in-vimscript
-    let l:os = "Windows"
-    if !(has("win64") || has("win32") || has("win16"))
-        let l:os = substitute(system('uname'), '\n', '', '')
-    endif
-    if l:os == "Darwin"
+    if s:os == "Darwin"
         return SaveFileTMPMacOS(a:imgdir, a:tmpname)
-    elseif l:os == "Linux"
+    elseif s:os == "Linux"
         return SaveFileTMPLinux(a:imgdir, a:tmpname)
-    elseif l:os == "Windows"
+    elseif s:os == "Windows"
         return SaveFileTMPWin32(a:imgdir, a:tmpname)
     endif
 endfunction
@@ -102,6 +97,12 @@ function! RandomName()
 endfunction
 
 function! mdip#MarkdownClipboardImage()
+    " detect os: https://vi.stackexchange.com/questions/2572/detect-os-in-vimscript
+    let s:os = "Windows"
+    if !(has("win64") || has("win32") || has("win16"))
+        let s:os = substitute(system('uname'), '\n', '', '')
+    endif
+
     let workdir = SafeMakeDir()
     " change temp-file-name and image-name
     let g:mdip_tmpname = RandomName()
