@@ -1,7 +1,7 @@
 function! SafeMakeDir()
     if has('win32')
         let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
-    else    
+    else
         let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
     endif
     if !isdirectory(outdir)
@@ -61,15 +61,15 @@ endfunction
 
 function! SaveFileTMP(imgdir, tmpname)
     " detect os: https://vi.stackexchange.com/questions/2572/detect-os-in-vimscript
-    let os = "Windows"
+    let l:os = "Windows"
     if !(has("win64") || has("win32") || has("win16"))
-        let os = substitute(system('uname'), '\n', '', '')
+        let l:os = substitute(system('uname'), '\n', '', '')
     endif
-    if os == "Darwin"
+    if l:os == "Darwin"
         return SaveFileTMPMacOS(a:imgdir, a:tmpname)
-    elseif os == "Linux"
+    elseif l:os == "Linux"
         return SaveFileTMPLinux(a:imgdir, a:tmpname)
-    elseif os == "Windows"
+    elseif l:os == "Windows"
         return SaveFileTMPWin32(a:imgdir, a:tmpname)
     endif
 endfunction
