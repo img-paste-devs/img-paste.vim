@@ -13,7 +13,7 @@ endfunction
 function! SaveFileTMPLinux(imgdir, tmpname) abort
     let targets = filter(
                 \ systemlist('xclip -selection clipboard -t TARGETS -o'),
-                \ 'v:val =~# ''image''')
+                \ 'v:val =~# ''image/''')
     if empty(targets) | return 1 | endif
 
     let mimetype = targets[0]
