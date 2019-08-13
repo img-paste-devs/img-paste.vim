@@ -1,7 +1,7 @@
 function! SafeMakeDir()
-    if has('win32')
+    if s:os == "Windows"
         let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
-    else    
+    else
         let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
     endif
     if !isdirectory(outdir)
@@ -13,7 +13,7 @@ endfunction
 function! SaveFileTMPLinux(imgdir, tmpname) abort
     let targets = filter(
                 \ systemlist('xclip -selection clipboard -t TARGETS -o'),
-                \ 'v:val =~# ''image''')
+                \ 'v:val =~# ''image/''')
     if empty(targets) | return 1 | endif
 
     let mimetype = targets[0]
@@ -60,16 +60,12 @@ function! SaveFileTMPMacOS(imgdir, tmpname) abort
 endfunction
 
 function! SaveFileTMP(imgdir, tmpname)
-    if has('unix')
-      "from mac https://superuser.com/a/193638/15231
-        let s:uname = system("uname")
-            if s:uname == "Darwin\n"
-                return SaveFileTMPMacOS(a:imgdir, a:tmpname)
-        endif
-    elseif has('win32')
-        return SaveFileTMPWin32(a:imgdir, a:tmpname)
-    else
+    if s:os == "Darwin"
+        return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+    elseif s:os == "Linux"
         return SaveFileTMPLinux(a:imgdir, a:tmpname)
+    elseif s:os == "Windows"
+        return SaveFileTMPWin32(a:imgdir, a:tmpname)
     endif
 endfunction
 
@@ -101,6 +97,12 @@ function! RandomName()
 endfunction
 
 function! mdip#MarkdownClipboardImage()
+    " detect os: https://vi.stackexchange.com/questions/2572/detect-os-in-vimscript
+    let s:os = "Windows"
+    if !(has("win64") || has("win32") || has("win16"))
+        let s:os = substitute(system('uname'), '\n', '', '')
+    endif
+
     let workdir = SafeMakeDir()
     " change temp-file-name and image-name
     let g:mdip_tmpname = RandomName()
