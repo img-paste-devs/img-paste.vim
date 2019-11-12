@@ -92,9 +92,14 @@ function! SaveNewFile(imgdir, tmpfile)
 endfunction
 
 function! RandomName()
-    let l:new_random = strftime("%Y-%m-%d-%H-%M-%S")
-    " creates a file like this: `2019-11-12-10-27-10.png`
-    " the filesystem on Windows does not allow : character.
+    " help feature-list
+    if has('win16') || has('win32') || has('win64') || has('win95')
+        let l:new_random = strftime("%Y-%m-%d-%H-%M-%S")
+        " creates a file like this: `2019-11-12-10-27-10.png`
+        " the filesystem on Windows does not allow : character.
+    else
+        let l:new_random = strftime("%Y-%m-%d-%H:%M")
+    endif
     return l:new_random
 endfunction
 
