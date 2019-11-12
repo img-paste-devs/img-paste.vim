@@ -92,7 +92,9 @@ function! SaveNewFile(imgdir, tmpfile)
 endfunction
 
 function! RandomName()
-    let l:new_random = strftime("%Y-%m-%d-%H:%M")
+    let l:new_random = strftime("%Y-%m-%d-%H-%M-%S")
+    " creates a file like this: `2019-11-12-10-27-10.png`
+    " the filesystem on Windows does not allow : character.
     return l:new_random
 endfunction
 
