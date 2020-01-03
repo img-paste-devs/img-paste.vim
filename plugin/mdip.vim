@@ -120,7 +120,9 @@ function! mdip#MarkdownClipboardImage()
     let workdir = SafeMakeDir()
     " change temp-file-name and image-name
     let g:mdip_tmpname = InputName()
-    " let g:mdip_imgname = g:mdip_tmpname
+    if empty(g:mdip_tmpname)
+      let g:mdip_tmpname = RandomName()
+    endif
 
     let tmpfile = SaveFileTMP(workdir, g:mdip_tmpname)
     if tmpfile == 1
