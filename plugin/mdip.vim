@@ -98,7 +98,7 @@ function! RandomName()
         " creates a file like this: `2019-11-12-10-27-10.png`
         " the filesystem on Windows does not allow : character.
     else
-        let l:new_random = strftime("%Y-%m-%d-%H:%M")
+        let l:new_random = strftime("%Y-%m-%d-%H-%M-%S")
     endif
     return l:new_random
 endfunction
@@ -121,7 +121,7 @@ function! mdip#MarkdownClipboardImage()
     " change temp-file-name and image-name
     let g:mdip_tmpname = InputName()
     if empty(g:mdip_tmpname)
-      let g:mdip_tmpname = RandomName()
+      let g:mdip_tmpname = g:mdip_imgname . '_' . RandomName()
     endif
 
     let tmpfile = SaveFileTMP(workdir, g:mdip_tmpname)
