@@ -1,4 +1,4 @@
-function! SafeMakeDir()
+function! s:SafeMakeDir()
     if s:os == "Windows"
         let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
     else
@@ -10,7 +10,7 @@ function! SafeMakeDir()
     return fnameescape(outdir)
 endfunction
 
-function! SaveFileTMPLinux(imgdir, tmpname) abort
+function! s:SaveFileTMPLinux(imgdir, tmpname) abort
     let targets = filter(
                 \ systemlist('xclip -selection clipboard -t TARGETS -o'),
                 \ 'v:val =~# ''image/''')
@@ -24,7 +24,7 @@ function! SaveFileTMPLinux(imgdir, tmpname) abort
     return tmpfile
 endfunction
 
-function! SaveFileTMPWin32(imgdir, tmpname) abort
+function! s:SaveFileTMPWin32(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
 
     let clip_command = "Add-Type -AssemblyName System.Windows.Forms;"
@@ -41,9 +41,7 @@ function! SaveFileTMPWin32(imgdir, tmpname) abort
     endif
 endfunction
 
-
-
-function! SaveFileTMPMacOS(imgdir, tmpname) abort
+function! s:SaveFileTMPMacOS(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
     let clip_command = 'osascript'
     let clip_command .= ' -e "set png_data to the clipboard as «class PNGf»"'
@@ -59,17 +57,17 @@ function! SaveFileTMPMacOS(imgdir, tmpname) abort
     endif
 endfunction
 
-function! SaveFileTMP(imgdir, tmpname)
+function! s:SaveFileTMP(imgdir, tmpname)
     if s:os == "Darwin"
-        return SaveFileTMPMacOS(a:imgdir, a:tmpname)
+        return s:SaveFileTMPMacOS(a:imgdir, a:tmpname)
     elseif s:os == "Linux"
-        return SaveFileTMPLinux(a:imgdir, a:tmpname)
+        return s:SaveFileTMPLinux(a:imgdir, a:tmpname)
     elseif s:os == "Windows"
-        return SaveFileTMPWin32(a:imgdir, a:tmpname)
+        return s:SaveFileTMPWin32(a:imgdir, a:tmpname)
     endif
 endfunction
 
-function! SaveNewFile(imgdir, tmpfile)
+function! s:SaveNewFile(imgdir, tmpfile)
     let extension = split(a:tmpfile, '\.')[-1]
     let reldir = g:mdip_imgdir
     let cnt = 0
@@ -91,7 +89,7 @@ function! SaveNewFile(imgdir, tmpfile)
     return relpath
 endfunction
 
-function! RandomName()
+function! s:RandomName()
     " help feature-list
     if has('win16') || has('win32') || has('win64') || has('win95')
         let l:new_random = strftime("%Y-%m-%d-%H-%M-%S")
@@ -103,7 +101,7 @@ function! RandomName()
     return l:new_random
 endfunction
 
-function! InputName()
+function! s:InputName()
     call inputsave()
     let name = input('Image name: ')
     call inputrestore()
@@ -117,18 +115,18 @@ function! mdip#MarkdownClipboardImage()
         let s:os = substitute(system('uname'), '\n', '', '')
     endif
 
-    let workdir = SafeMakeDir()
+    let workdir = s:SafeMakeDir()
     " change temp-file-name and image-name
-    let g:mdip_tmpname = InputName()
+    let g:mdip_tmpname = s:InputName()
     if empty(g:mdip_tmpname)
-      let g:mdip_tmpname = g:mdip_imgname . '_' . RandomName()
+      let g:mdip_tmpname = g:mdip_imgname . '_' . s:RandomName()
     endif
 
-    let tmpfile = SaveFileTMP(workdir, g:mdip_tmpname)
+    let tmpfile = s:SaveFileTMP(workdir, g:mdip_tmpname)
     if tmpfile == 1
         return
     else
-        " let relpath = SaveNewFile(g:mdip_imgdir, tmpfile)
+        " let relpath = s:SaveNewFile(g:mdip_imgdir, tmpfile)
         let extension = split(tmpfile, '\.')[-1]
         let relpath = g:mdip_imgdir . '/' . g:mdip_tmpname . '.' . extension
         execute "normal! i![I"
