@@ -16,8 +16,16 @@ function! s:SaveFileTMPLinux(imgdir, tmpname) abort
                 \ 'v:val =~# ''image/''')
     if empty(targets) | return 1 | endif
 
-    let mimetype = targets[0]
-    let extension = split(mimetype, '/')[-1]
+    if index(targets, "image/png") >= 0
+        " Use PNG if available
+        let mimetype = "image/png"
+        let extension = "png"
+    else
+        " Fallback
+        let mimetype = targets[0]
+        let extension = split(mimetype, '/')[-1]
+    endif
+
     let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
     call system(printf('xclip -selection clipboard -t %s -o > %s',
                 \ mimetype, tmpfile))
