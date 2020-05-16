@@ -7,7 +7,11 @@ function! s:SafeMakeDir()
     if !isdirectory(outdir)
         call mkdir(outdir)
     endif
-    return fnameescape(outdir)
+    if s:os == "Darwin"
+        return outdir
+    else
+        return fnameescape(outdir)
+    endif
 endfunction
 
 function! s:SaveFileTMPLinux(imgdir, tmpname) abort
