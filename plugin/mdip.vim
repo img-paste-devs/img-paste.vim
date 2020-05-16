@@ -1,3 +1,14 @@
+" https://stackoverflow.com/questions/57014805/check-if-using-windows-console-in-vim-while-in-windows-subsystem-for-linux
+function! s:IsWSL()
+    if has("unix")
+        let lines = readfile("/proc/version")
+        if lines[0] =~ "Microsoft"
+            return 1
+        endif
+    endif
+    return 0
+endfunction
+
 function! s:SafeMakeDir()
     if s:os == "Windows"
         let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
@@ -11,6 +22,24 @@ function! s:SafeMakeDir()
         return outdir
     else
         return fnameescape(outdir)
+    endif
+endfunction
+
+function! s:SaveFileTMPWSL(imgdir, tmpname) abort
+    let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
+    let tmpfile = substitute(system("wslpath -m ".tmpfile), '\n\+$', '', '')
+
+    let clip_command = "Add-Type -AssemblyName System.Windows.Forms;"
+    let clip_command .= "if ([Windows.Forms.Clipboard]::ContainsImage()) {"
+    let clip_command .= "[Windows.Forms.Clipboard]::GetImage().Save(\\\""
+    let clip_command .= tmpfile ."\\\", [System.Drawing.Imaging.ImageFormat]::Png) }"
+    let clip_command = "powershell.exe -sta \"".clip_command. "\""
+
+    call system(clip_command)
+    if v:shell_error == 1
+        return 1
+    else
+        return tmpfile
     endif
 endfunction
 
@@ -70,7 +99,9 @@ function! s:SaveFileTMPMacOS(imgdir, tmpname) abort
 endfunction
 
 function! s:SaveFileTMP(imgdir, tmpname)
-    if s:os == "Darwin"
+    if s:IsWSL()
+        return s:SaveFileTMPWSL(a:imgdir, a:tmpname)
+    elseif s:os == "Darwin"
         return s:SaveFileTMPMacOS(a:imgdir, a:tmpname)
     elseif s:os == "Linux"
         return s:SaveFileTMPLinux(a:imgdir, a:tmpname)
