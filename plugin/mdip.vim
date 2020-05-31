@@ -10,10 +10,14 @@ function! s:IsWSL()
 endfunction
 
 function! s:SafeMakeDir()
-    if s:os == "Windows"
-        let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
+    if !exists('g:mdip_imgdir_absolute')
+        if s:os == "Windows"  
+            let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
     else
-        let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
+            let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
+        endif
+    else 
+	let outdir = g:mdip_imgdir
     endif
     if !isdirectory(outdir)
         call mkdir(outdir)
@@ -171,7 +175,7 @@ function! mdip#MarkdownClipboardImage()
     else
         " let relpath = s:SaveNewFile(g:mdip_imgdir, tmpfile)
         let extension = split(tmpfile, '\.')[-1]
-        let relpath = g:mdip_imgdir . '/' . g:mdip_tmpname . '.' . extension
+        let relpath = g:mdip_imgdir_intext . '/' . g:mdip_tmpname . '.' . extension
         execute "normal! i![I"
         let ipos = getcurpos()
         execute "normal! amage](" . relpath . ")"
@@ -180,8 +184,16 @@ function! mdip#MarkdownClipboardImage()
     endif
 endfunction
 
-if !exists('g:mdip_imgdir')
+if !exists('g:mdip_imgdir') && !exists('g:mdip_imgdir_absolute')
     let g:mdip_imgdir = 'img'
+endif
+"allow absolute paths. E.g., on linux: /home/path/to/imgdir/
+if exists('g:mdip_imgdir_absolute')
+    let g:mdip_imgdir = g:mdip_imgdir_absolute
+endif
+"allow a different intext reference for relative links
+if !exists('g:mdip_imgdir_intext')
+    let g:mdip_imgdir_intext = g:mdip_imgdir
 endif
 if !exists('g:mdip_tmpname')
     let g:mdip_tmpname = 'tmp'
