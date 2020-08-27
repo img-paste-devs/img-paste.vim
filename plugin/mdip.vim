@@ -101,14 +101,14 @@ function! s:SaveFileTMPMacOS(imgdir, tmpname) abort
 endfunction
 
 function! s:SaveFileTMP(imgdir, tmpname)
-    if s:os == "Darwin"
-        return s:SaveFileTMPMacOS(a:imgdir, a:tmpname)
-    elseif s:os == "Linux"
+    if s:os == "Linux"
         " Linux could also mean Windowns Subsystem for Linux
         if s:IsWSL()
             return s:SaveFileTMPWSL(a:imgdir, a:tmpname)
         endif
         return s:SaveFileTMPLinux(a:imgdir, a:tmpname)
+    elseif s:os == "Darwin"
+        return s:SaveFileTMPMacOS(a:imgdir, a:tmpname)
     elseif s:os == "Windows"
         return s:SaveFileTMPWin32(a:imgdir, a:tmpname)
     endif
