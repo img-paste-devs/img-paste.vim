@@ -1,4 +1,11 @@
 " https://stackoverflow.com/questions/57014805/check-if-using-windows-console-in-vim-while-in-windows-subsystem-for-linux
+function! IsWSL()
+    let lines = readfile("/proc/version")
+    if lines[0] =~ "Microsoft"
+        return 1
+    endif
+    return 0
+endfunction
 
 function! s:SafeMakeDir()
     if !exists('g:mdip_imgdir_absolute')
@@ -97,6 +104,10 @@ function! s:SaveFileTMP(imgdir, tmpname)
     if s:os == "Darwin"
         return s:SaveFileTMPMacOS(a:imgdir, a:tmpname)
     elseif s:os == "Linux"
+        " Linux could also mean Windowns Subsystem for Linux
+        if s:IsWSL()
+            return s:SaveFileTMPWSL(a:imgdir, a:tmpname)
+        endif
         return s:SaveFileTMPLinux(a:imgdir, a:tmpname)
     elseif s:os == "Windows"
         return s:SaveFileTMPWin32(a:imgdir, a:tmpname)
