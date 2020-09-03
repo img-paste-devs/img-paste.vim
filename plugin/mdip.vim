@@ -1,5 +1,5 @@
 " https://stackoverflow.com/questions/57014805/check-if-using-windows-console-in-vim-while-in-windows-subsystem-for-linux
-function! IsWSL()
+function! s:IsWSL()
     let lines = readfile("/proc/version")
     if lines[0] =~ "Microsoft"
         return 1
