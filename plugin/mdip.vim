@@ -11,12 +11,12 @@ endfunction
 
 function! s:SafeMakeDir()
     if !exists('g:mdip_imgdir_absolute')
-        if s:os == "Windows"  
+        if s:os == "Windows"
             let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
     else
             let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
         endif
-    else 
+    else
 	let outdir = g:mdip_imgdir
     endif
     if !isdirectory(outdir)
@@ -31,7 +31,6 @@ endfunction
 
 function! s:SaveFileTMPWSL(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
-    let tmpfile = substitute(system("wslpath -m ".tmpfile), '\n\+$', '', '')
 
     let clip_command = "Add-Type -AssemblyName System.Windows.Forms;"
     let clip_command .= "if ([Windows.Forms.Clipboard]::ContainsImage()) {"
