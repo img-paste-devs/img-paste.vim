@@ -67,7 +67,8 @@ function! s:SaveFileTMPLinux(imgdir, tmpname) abort
 endfunction
 
 function! s:SaveFileTMPWin32(imgdir, tmpname) abort
-    let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
+    let tmpfile = a:imgdir . '\' . a:tmpname . '.png'
+    let tmpfile = substitute(tmpfile, '\\ ', ' ', 'g')
 
     let clip_command = "Add-Type -AssemblyName System.Windows.Forms;"
     let clip_command .= "if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {"
