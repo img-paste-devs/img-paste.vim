@@ -45,9 +45,18 @@ function! s:SaveFileTMPWSL(imgdir, tmpname) abort
 endfunction
 
 function! s:SaveFileTMPLinux(imgdir, tmpname) abort
-    let targets = filter(
-                \ systemlist('xclip -selection clipboard -t TARGETS -o'),
-                \ 'v:val =~# ''image/''')
+    if $WAYLAND_DISPLAY != "" && executable('wl-copy')
+        let system_targets = "wl-paste --list-types"
+        let system_clip = "wl-paste --no-newline --type %s > %s"
+    elseif $DISPLAY != '' && executable('xclip')
+        let system_targets = 'xclip -selection clipboard -t TARGETS -o'
+        let system_clip = 'xclip -selection clipboard -t %s -o > %s'
+    else
+        echoerr 'Needs xclip in X11 or wl-clipboard in Wayland.'
+        return 1
+    endif
+
+    let targets = filter(systemlist(system_targets), 'v:val =~# ''image/''')
     if empty(targets) | return 1 | endif
 
     if index(targets, "image/png") >= 0
@@ -61,8 +70,7 @@ function! s:SaveFileTMPLinux(imgdir, tmpname) abort
     endif
 
     let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
-    call system(printf('xclip -selection clipboard -t %s -o > %s',
-                \ mimetype, tmpfile))
+    call system(printf(system_clip, mimetype, tmpfile))
     return tmpfile
 endfunction
 
