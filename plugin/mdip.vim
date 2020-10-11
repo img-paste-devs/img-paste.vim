@@ -176,11 +176,11 @@ function! mdip#MarkdownClipboardImage()
         " let relpath = s:SaveNewFile(g:mdip_imgdir, tmpfile)
         let extension = split(tmpfile, '\.')[-1]
         let relpath = g:mdip_imgdir_intext . '/' . g:mdip_tmpname . '.' . extension
-        execute "normal! i![I"
+        execute "normal! i![" . g:mdip_tmpname[0:0]
         let ipos = getcurpos()
-        execute "normal! amage](" . relpath . ")"
+        execute "normal! a" . g:mdip_tmpname[1:] . "](" . relpath . ")"
         call setpos('.', ipos)
-        execute "normal! ve\<C-g>"
+        execute "normal! vt]\<C-g>"
     endif
 endfunction
 
