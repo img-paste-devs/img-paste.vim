@@ -181,14 +181,20 @@ function! mdip#MarkdownClipboardImage()
     if tmpfile == 1
         return
     else
-        " let relpath = s:SaveNewFile(g:mdip_imgdir, tmpfile)
-        let extension = split(tmpfile, '\.')[-1]
+	let extension = split(tmpfile, '\.')[-1]
         let relpath = g:mdip_imgdir_intext . '/' . g:mdip_tmpname . '.' . extension
-        execute "normal! i![" . g:mdip_tmpname[0:0]
-        let ipos = getcurpos()
-        execute "normal! a" . g:mdip_tmpname[1:] . "](" . relpath . ")"
-        call setpos('.', ipos)
-        execute "normal! vt]\<C-g>"
+	if &filetype == 'md' || &filetype == 'pandoc'
+	    execute "normal! i![" . g:mdip_tmpname[0:0]
+	    let ipos = getcurpos()
+	    execute "normal! a" . g:mdip_tmpname[1:] . "](" . relpath . ")"
+	    call setpos('.', ipos)
+		execute "normal! vt]\<C-g>"
+	elseif &filetype == 'tex'
+	    let ipos = getcurpos()
+	    execute "normal! a" . relpath
+	    call setpos('.', ipos)
+	    execute "normal! vt]\<C-g>"
+	endif
     endif
 endfunction
 
