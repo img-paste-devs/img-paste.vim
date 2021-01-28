@@ -199,6 +199,10 @@ endif
 if exists('g:mdip_imgdir_absolute')
     let g:mdip_imgdir = g:mdip_imgdir_absolute
 endif
+"prefix dir name with filename_ (without extension)
+if exists('g:mdip_imgdir_filename_prefix') && g:mdip_imgdir_filename_prefix == 1
+	let g:mdip_imgdir = expand("%:r") . "_" . g:mdip_imgdir
+endif
 "allow a different intext reference for relative links
 if !exists('g:mdip_imgdir_intext')
     let g:mdip_imgdir_intext = g:mdip_imgdir
