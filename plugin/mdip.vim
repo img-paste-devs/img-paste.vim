@@ -71,6 +71,10 @@ function! s:SaveFileTMPLinux(imgdir, tmpname) abort
 
     let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
     call system(printf(system_clip, mimetype, tmpfile))
+    " modify
+    if index(targets, "image/png") < 0
+      call system("magick convert " . tmpfile . " " . a:imgdir . '/' . a:tmpname . '.png')
+      let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
     return tmpfile
 endfunction
 
