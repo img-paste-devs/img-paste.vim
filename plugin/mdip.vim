@@ -1,7 +1,7 @@
 " https://stackoverflow.com/questions/57014805/check-if-using-windows-console-in-vim-while-in-windows-subsystem-for-linux
 function! s:IsWSL()
     let lines = readfile("/proc/version")
-    if (lines[0] =~ "microsoft" || lines[0] =~ "microsoft")
+    if (lines[0] =~ "Microsoft" || lines[0] =~ "microsoft")
         return 1
     endif
     return 0
@@ -73,10 +73,6 @@ function! s:SaveFileTMPLinux(imgdir, tmpname) abort
 
     let tmpfile = a:imgdir . '/' . a:tmpname . '.' . extension
     call system(printf(system_clip, mimetype, tmpfile))
-    " modify
-    if index(targets, "image/png") < 0
-      call system("magick convert " . tmpfile . " " . a:imgdir . '/' . a:tmpname . '.png')
-      let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
     return tmpfile
 endfunction
 
