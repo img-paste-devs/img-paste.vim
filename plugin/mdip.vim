@@ -30,7 +30,11 @@ endfunction
 function! s:SaveFileTMPWSL(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
     let tmpfile = substitute(tmpfile, "\/", "\\\\\\", "g")
-    let tmpfile = substitute(tmpfile, "\\\\\\\\mnt\\\\\\\\c", "C:", "g")
+    if tmpfile =~ "mnt"
+      let tmpfile = substitute(tmpfile, "\\\\\\\\mnt\\\\\\\\c", "C:", "g")
+    else
+      let tmpfile = '\\\\wsl\$\\Ubuntu'.tmpfile
+    endif
 
     let clip_command = 'powershell.exe -sta "Add-Type -Assembly PresentationCore;\$img = [Windows.Clipboard]::GetImage();\$file = \"'. tmpfile . '\";\$stream = [IO.File]::Open(\$file, \"OpenOrCreate\");\$encoder = New-Object Windows.Media.Imaging.JpegBitmapEncoder;\$encoder.QualityLevel = 90;\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$img));\$encoder.Save(\$stream);\$stream.Dispose()"'
 
