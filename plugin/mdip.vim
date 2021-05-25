@@ -1,7 +1,7 @@
 " https://stackoverflow.com/questions/57014805/check-if-using-windows-console-in-vim-while-in-windows-subsystem-for-linux
 function! s:IsWSL()
     let lines = readfile("/proc/version")
-    if lines[0] =~ "Microsoft"
+    if (lines[0] =~ "microsoft" || lines[0] =~ "microsoft")
         return 1
     endif
     return 0
@@ -29,12 +29,10 @@ endfunction
 
 function! s:SaveFileTMPWSL(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
+    let tmpfile = substitute(tmpfile, "\/", "\\\\\\", "g")
+    let tmpfile = substitute(tmpfile, "\\\\\\\\mnt\\\\\\\\c", "C:", "g")
 
-    let clip_command = "Add-Type -AssemblyName System.Windows.Forms;"
-    let clip_command .= "if ([Windows.Forms.Clipboard]::ContainsImage()) {"
-    let clip_command .= "[Windows.Forms.Clipboard]::GetImage().Save(\\\""
-    let clip_command .= tmpfile ."\\\", [System.Drawing.Imaging.ImageFormat]::Png) }"
-    let clip_command = "powershell.exe -sta \"".clip_command. "\""
+    let clip_command = 'powershell.exe -sta "Add-Type -Assembly PresentationCore;\$img = [Windows.Clipboard]::GetImage();\$file = \"'. tmpfile . '\";\$stream = [IO.File]::Open(\$file, \"OpenOrCreate\");\$encoder = New-Object Windows.Media.Imaging.JpegBitmapEncoder;\$encoder.QualityLevel = 90;\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$img));\$encoder.Save(\$stream);\$stream.Dispose()"'
 
     call system(clip_command)
     if v:shell_error == 1
