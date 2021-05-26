@@ -36,7 +36,14 @@ function! s:SaveFileTMPWSL(imgdir, tmpname) abort
       let tmpfile = '\\\\wsl\$\\Ubuntu'.tmpfile
     endif
 
-    let clip_command = 'powershell.exe -sta "Add-Type -Assembly PresentationCore;\$img = [Windows.Clipboard]::GetImage();\$file = \"'. tmpfile . '\";\$stream = [IO.File]::Open(\$file, \"OpenOrCreate\");\$encoder = New-Object Windows.Media.Imaging.JpegBitmapEncoder;\$encoder.QualityLevel = 90;\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$img));\$encoder.Save(\$stream);\$stream.Dispose()"'
+    let clip_command = 'powershell.exe -sta "Add-Type -Assembly PresentationCore;'.
+          \'\$img = [Windows.Clipboard]::GetImage();'.
+          \'\$file = \"'. tmpfile . '\";'.
+          \'\$stream = [IO.File]::Open(\$file, \"OpenOrCreate\");'.
+          \'\$encoder = New-Object Windows.Media.Imaging.JpegBitmapEncoder;'.
+          \'\$encoder.QualityLevel = 90;'.
+          \'\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$img));'.
+          \'\$encoder.Save(\$stream);\$stream.Dispose()"'
 
     call system(clip_command)
     if v:shell_error == 1
