@@ -43,11 +43,11 @@ function! s:SaveFileTMPWSL(imgdir, tmpname) abort
           \'Exit;'.
           \'} else{'.
           \'echo "good";}'.
+          \'\$fcb = new-object Windows.Media.Imaging.FormatConvertedBitmap(\$img, [Windows.Media.PixelFormats]::Rgb24, \$null, 0);'.
           \'\$file = \"'. tmpfile . '\";'.
           \'\$stream = [IO.File]::Open(\$file, \"OpenOrCreate\");'.
-          \'\$encoder = New-Object Windows.Media.Imaging.JpegBitmapEncoder;'.
-          \'\$encoder.QualityLevel = 90;'.
-          \'\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$img));'.
+          \'\$encoder = New-Object Windows.Media.Imaging.PngBitmapEncoder;'.
+          \'\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$fcb));'.
           \'\$encoder.Save(\$stream);\$stream.Dispose();"'
 
     let result = system(clip_command)[:-3]
