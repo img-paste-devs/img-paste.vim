@@ -1,7 +1,7 @@
 " https://stackoverflow.com/questions/57014805/check-if-using-windows-console-in-vim-while-in-windows-subsystem-for-linux
 function! s:IsWSL()
     let lines = readfile("/proc/version")
-    if lines[0] =~ "Microsoft"
+    if (lines[0] =~ "Microsoft" || lines[0] =~ "microsoft")
         return 1
     endif
     return 0
@@ -29,18 +29,32 @@ endfunction
 
 function! s:SaveFileTMPWSL(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
-
-    let clip_command = "Add-Type -AssemblyName System.Windows.Forms;"
-    let clip_command .= "if ([Windows.Forms.Clipboard]::ContainsImage()) {"
-    let clip_command .= "[Windows.Forms.Clipboard]::GetImage().Save(\\\""
-    let clip_command .= tmpfile ."\\\", [System.Drawing.Imaging.ImageFormat]::Png) }"
-    let clip_command = "powershell.exe -sta \"".clip_command. "\""
-
-    call system(clip_command)
-    if v:shell_error == 1
-        return 1
+    let tmpfile = substitute(tmpfile, "\/", "\\\\\\", "g")
+    if tmpfile =~ "mnt"
+        let tmpfile = substitute(tmpfile, "\\\\\\\\mnt\\\\\\\\c", "C:", "g")
     else
+        let tmpfile = '\\\\wsl\$\\Ubuntu'.tmpfile
+    endif
+
+    let clip_command = 'powershell.exe -sta "Add-Type -Assembly PresentationCore;'.
+          \'\$img = [Windows.Clipboard]::GetImage();'.
+          \'if (\$img -eq \$null) {'.
+          \'echo "Do not contain image.";'.
+          \'Exit;'.
+          \'} else{'.
+          \'echo "good";}'.
+          \'\$fcb = new-object Windows.Media.Imaging.FormatConvertedBitmap(\$img, [Windows.Media.PixelFormats]::Rgb24, \$null, 0);'.
+          \'\$file = \"'. tmpfile . '\";'.
+          \'\$stream = [IO.File]::Open(\$file, \"OpenOrCreate\");'.
+          \'\$encoder = New-Object Windows.Media.Imaging.PngBitmapEncoder;'.
+          \'\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$fcb));'.
+          \'\$encoder.Save(\$stream);\$stream.Dispose();"'
+
+    let result = system(clip_command)[:-3]
+    if result ==# "good"
         return tmpfile
+    else
+        return 1
     endif
 endfunction
 
