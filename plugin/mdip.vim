@@ -31,25 +31,30 @@ function! s:SaveFileTMPWSL(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
     let tmpfile = substitute(tmpfile, "\/", "\\\\\\", "g")
     if tmpfile =~ "mnt"
-      let tmpfile = substitute(tmpfile, "\\\\\\\\mnt\\\\\\\\c", "C:", "g")
+        let tmpfile = substitute(tmpfile, "\\\\\\\\mnt\\\\\\\\c", "C:", "g")
     else
-      let tmpfile = '\\\\wsl\$\\Ubuntu'.tmpfile
+        let tmpfile = '\\\\wsl\$\\Ubuntu'.tmpfile
     endif
 
     let clip_command = 'powershell.exe -sta "Add-Type -Assembly PresentationCore;'.
           \'\$img = [Windows.Clipboard]::GetImage();'.
+          \'if (\$img -eq \$null) {'.
+          \'echo "Do not contain image.";'.
+          \'Exit;'.
+          \'} else{'.
+          \'echo "good";}'.
           \'\$file = \"'. tmpfile . '\";'.
           \'\$stream = [IO.File]::Open(\$file, \"OpenOrCreate\");'.
           \'\$encoder = New-Object Windows.Media.Imaging.JpegBitmapEncoder;'.
           \'\$encoder.QualityLevel = 90;'.
           \'\$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create(\$img));'.
-          \'\$encoder.Save(\$stream);\$stream.Dispose()"'
+          \'\$encoder.Save(\$stream);\$stream.Dispose();"'
 
-    call system(clip_command)
-    if v:shell_error == 1
-        return 1
-    else
+    let result = system(clip_command)[:-3]
+    if result ==# "good"
         return tmpfile
+    else
+        return 1
     endif
 endfunction
 
