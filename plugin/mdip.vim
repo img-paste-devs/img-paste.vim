@@ -185,6 +185,18 @@ function! g:MarkdownPasteImage(relpath)
         execute "normal! vt]\<C-g>"
 endfunction
 
+function! g:LatexPasteImage(relpath)
+    execute "normal! i\\includegraphics{" . a:relpath . "}\r\\caption{I"
+    let ipos = getcurpos()
+    execute "normal! a" . "mage}"
+    call setpos('.', ipos)
+    execute "normal! ve\<C-g>"
+endfunction
+
+function! g:EmptyPasteImage(relpath)
+    execute "normal! i" . a:relpath 
+endfunction
+
 let g:PasteImageFunction = 'g:MarkdownPasteImage'
 
 function! mdip#MarkdownClipboardImage()
