@@ -22,6 +22,32 @@ autocmd FileType markdown nmap <buffer><silent> <leader>p :call mdip#MarkdownCli
 " let g:mdip_imgname = 'image'
 ```
 
+### Extend to other markup languages ###
+Simply add a custom paste function that accepts the relative path to the image as an argument, and set `g:PasteImageFunction` to the name of your function. E.g. 
+```
+function! g:LatexPasteImage(relpath)
+    execute "normal! i\\includegraphics{" . a:relpath . "}\r\\caption{I"
+    let ipos = getcurpos()
+    execute "normal! a" . "mage}"
+    call setpos('.', ipos)
+    execute "normal! ve\<C-g>"
+endfunction
+```
+Then in your .vimrc:
+```
+autocmd FileType markdown let g:PasteImageFunction = 'g:MarkdownPasteImage'
+autocmd FileType tex let g:PasteImageFunction = 'g:LatexPasteImage'
+```
+The former sets the (default) markdown paste function for markdown files, while the latter sets the new latex paste function to be used in latex/tex files. The above LatesPasteImage has already been added to the plugin, see `plugin/mdip.vim`. Existing paste functions:
+
+| Filetype | Function name | Content |
+|----------|---------------|---------|
+| Markdown | MarkdownPasteImate | `![Image](path)` |
+| Latex | LatexPasteImate | `\includegraphics{path} \caption{Image}` |
+| N/A  | EmptyPasteImate | `path` |
+
+PRs welcome
+
 ### For linux user
 This plugin gets clipboard content by running the `xclip` command.
 
