@@ -18,7 +18,7 @@ function! s:SafeMakeDir()
 	let outdir = g:mdip_imgdir
     endif
     if !isdirectory(outdir)
-        call mkdir(outdir)
+        call mkdir(outdir,"p",0700)
     endif
     if s:os == "Darwin"
         return outdir
