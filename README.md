@@ -42,9 +42,9 @@ The former sets the (default) markdown paste function for markdown files, while 
 
 | Filetype | Function name | Content |
 |----------|---------------|---------|
-| Markdown | MarkdownPasteImate | `![Image](path)` |
-| Latex | LatexPasteImate | `\includegraphics{path} \caption{Image}` |
-| N/A  | EmptyPasteImate | `path` |
+| Markdown | MarkdownPasteImage | `![Image](path)` |
+| Latex | LatexPasteImage | `\includegraphics{path} \caption{Image}` |
+| N/A  | EmptyPasteImage | `path` |
 
 PRs welcome
 
