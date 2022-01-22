@@ -40,6 +40,12 @@ autocmd FileType tex let g:PasteImageFunction = 'g:LatexPasteImage'
 ```
 The former sets the (default) markdown paste function for markdown files, while the latter sets the new latex paste function to be used in latex/tex files. The above LatesPasteImage has already been added to the plugin, see `plugin/mdip.vim`. Existing paste functions:
 
+Finally, add the file type (e.g. `tex`) to the first line you added, as
+```
+autocmd FileType markdown,tex nmap <buffer><silent> <leader>p :call mdip#MarkdownClipboardImage()<CR>
+                        '----'
+```
+
 | Filetype | Function name | Content |
 |----------|---------------|---------|
 | Markdown | MarkdownPasteImage | `![Image](path)` |
