@@ -209,7 +209,7 @@ function! mdip#MarkdownClipboardImage()
 
     " prefix dir name with filename_ (without extension)
     if exists('g:mdip_imgdir_filename_prefix') && g:mdip_imgdir_filename_prefix == 1
-        let g:mdip_final_imgdir = expand("%:r") . "_" . g:mdip_imgdir
+        let g:mdip_final_imgdir = g:mdip_imgdir . '/' . expand("%:r")
     else
         let g:mdip_final_imgdir = g:mdip_imgdir
     endif
@@ -223,7 +223,7 @@ function! mdip#MarkdownClipboardImage()
     " change temp-file-name and image-name
     let g:mdip_tmpname = s:InputName()
     if empty(g:mdip_tmpname)
-        let g:mdip_tmpname = g:mdip_imgname . '_' . s:RandomName()
+        let g:mdip_tmpname = g:mdip_imgname . '/' . s:RandomName()
     endif
 
     let tmpfile = s:SaveFileTMP(workdir, g:mdip_tmpname)
