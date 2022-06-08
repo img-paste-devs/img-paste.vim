@@ -206,12 +206,21 @@ function! mdip#MarkdownClipboardImage()
         let s:os = substitute(system('uname'), '\n', '', '')
     endif
 
-    let workdir = s:SafeMakeDir()
-    " change temp-file-name and image-name
-    let g:mdip_tmpname = s:InputName()
-    if empty(g:mdip_tmpname)
-      let g:mdip_tmpname = g:mdip_imgname . '_' . s:RandomName()
-    endif
+    " add check whether file with the name exists
+    while  1
+        let workdir = s:SafeMakeDir()
+        " change temp-file-name and image-name
+        let g:mdip_tmpname = s:InputName()
+        if empty(g:mdip_tmpname)
+          let g:mdip_tmpname = g:mdip_imgname . '_' . s:RandomName()
+        endif
+        let testpath =  workdir . '/' . g:mdip_tmpname . '.png'
+        if filereadable(testpath) == 0
+            break
+        else
+            echo "\nThis file name already exists"
+        endif
+    endwhile
 
     let tmpfile = s:SaveFileTMP(workdir, g:mdip_tmpname)
     if tmpfile == 1
