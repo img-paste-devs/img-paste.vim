@@ -36,7 +36,7 @@ function! s:SaveFileTMPWSL(imgdir, tmpname) abort
         let tmpfile = '\\\\wsl\$\\Ubuntu'.tmpfile
     endif
 
-    let clip_command = 'powershell.exe -sta "Add-Type -Assembly PresentationCore;'.
+    let clip_command = 'powershell.exe -nologo -noprofile -noninteractive -sta "Add-Type -Assembly PresentationCore;'.
           \'\$img = [Windows.Clipboard]::GetImage();'.
           \'if (\$img -eq \$null) {'.
           \'echo "Do not contain image.";'.
@@ -96,7 +96,7 @@ function! s:SaveFileTMPWin32(imgdir, tmpname) abort
     let clip_command .= "if ($([System.Windows.Forms.Clipboard]::ContainsImage())) {"
     let clip_command .= "[System.Drawing.Bitmap][System.Windows.Forms.Clipboard]::GetDataObject().getimage().Save('"
     let clip_command .= tmpfile ."', [System.Drawing.Imaging.ImageFormat]::Png) }"
-    let clip_command = "powershell -sta \"".clip_command. "\""
+    let clip_command = "powershell -nologo -noprofile -noninteractive -sta \"".clip_command. "\""
 
     silent call system(clip_command)
     if v:shell_error == 1
