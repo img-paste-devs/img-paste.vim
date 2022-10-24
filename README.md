@@ -1,4 +1,4 @@
-# md-img-paste.vim
+# img-paste.vim
 Yet simple tool to paste images into markdown files
 
 ## Use Case
@@ -10,7 +10,7 @@ By default, the location of the saved file (`img/image1.png`) and the in-text re
 
 Using Vundle
 ```
-Plugin 'ferrine/md-img-paste.vim'
+Plugin 'img-paste-devs/img-paste.vim'
 ```
 
 ## Usage
