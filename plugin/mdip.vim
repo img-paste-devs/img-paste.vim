@@ -8,17 +8,27 @@ function! s:IsWSL()
 endfunction
 
 function! s:SafeMakeDir()
-    if !exists('g:mdip_imgdir_absolute')
+    ""
+    " Assets directory based on the basename of the current buffer.
+    "
+    if exists('g:mdip_imgdir_bufname')
+        ""
+        " The full path to the current buffer without the extension.
+        "
+        let path = expand('%:p:r')
+        let outdir = path . '.assets'
+    elseif !exists('g:mdip_imgdir_absolute')
         if s:os == "Windows"
             let outdir = expand('%:p:h') . '\' . g:mdip_imgdir
-    else
+        else
             let outdir = expand('%:p:h') . '/' . g:mdip_imgdir
         endif
     else
-	let outdir = g:mdip_imgdir
+        let outdir = g:mdip_imgdir
     endif
+
     if !isdirectory(outdir)
-        call mkdir(outdir,"p",0700)
+        call mkdir(outdir, "p", 0700)
     endif
     if s:os == "Darwin"
         return outdir
@@ -137,11 +147,11 @@ function! s:SaveFileTMP(imgdir, tmpname)
 endfunction
 
 function! s:SaveNewFile(imgdir, tmpfile)
-    let extension = split(a:tmpfile, '\.')[-1]
+    let ext = split(a:tmpfile, '\.')[-1]
     let reldir = g:mdip_imgdir
     let cnt = 0
-    let filename = a:imgdir . '/' . g:mdip_imgname . cnt . '.' . extension
-    let relpath = reldir . '/' . g:mdip_imgname . cnt . '.' . extension
+    let filename = a:imgdir . '/' . g:mdip_imgname . cnt . '.' . ext
+    let relpath = reldir . '/' . g:mdip_imgname . cnt . '.' . ext
     while filereadable(filename)
         call system('diff ' . a:tmpfile . ' ' . filename)
         if !v:shell_error
@@ -149,8 +159,8 @@ function! s:SaveNewFile(imgdir, tmpfile)
             return relpath
         endif
         let cnt += 1
-        let filename = a:imgdir . '/' . g:mdip_imgname . cnt . '.' . extension
-        let relpath = reldir . '/' . g:mdip_imgname . cnt . '.' . extension
+        let filename = a:imgdir . '/' . g:mdip_imgname . cnt . '.' . ext
+        let relpath = reldir . '/' . g:mdip_imgname . cnt . '.' . ext
     endwhile
     if filereadable(a:tmpfile)
         call rename(a:tmpfile, filename)
@@ -194,7 +204,7 @@ function! g:LatexPasteImage(relpath)
 endfunction
 
 function! g:EmptyPasteImage(relpath)
-    execute "normal! i" . a:relpath 
+    execute "normal! i" . a:relpath
 endfunction
 
 let g:PasteImageFunction = 'g:MarkdownPasteImage'
@@ -244,7 +254,15 @@ if exists('g:mdip_imgdir_absolute')
 endif
 "allow a different intext reference for relative links
 if !exists('g:mdip_imgdir_intext')
-    let g:mdip_imgdir_intext = g:mdip_imgdir
+    ""
+    " Assets directory based on the name of the current buffer.
+    "
+    if exists('g:mdip_imgdir_bufname')
+        let path = expand('%:r')
+        let g:mdip_imgdir_intext = path . '.assets'
+    else
+        let g:mdip_imgdir_intext = g:mdip_imgdir
+    endif
 endif
 if !exists('g:mdip_tmpname')
     let g:mdip_tmpname = 'tmp'
