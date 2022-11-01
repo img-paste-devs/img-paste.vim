@@ -1,5 +1,14 @@
 # img-paste.vim
+
 Yet simple tool to paste images into markdown files
+
+* [Use Case](#use-case)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Extend to other markup languages](#extend-to-other-markup-languages)
+  * [Asciidoctor](#asciidoctor)
+  * [For linux user](#for-linux-user)
+* [Acknowledgements](#acknowledgements)
 
 ## Use Case
 You are editing a markdown file and have an image on the clipboard and want to paste it into the document as the text `![](img/image1.png)`. Instead of first copying it to that directory, you want to do it with a single `<leader>p` key press in Vim. So it hooks `<leader>p`, checks if you are editing a Markdown file, saves the image from the clipboard to the location  `img/image1.png`, and inserts `![](img/image1.png)` into the file.
@@ -10,7 +19,7 @@ By default, the location of the saved file (`img/image1.png`) and the in-text re
 
 Using Vundle
 ```
-Plugin 'img-paste-devs/img-paste.vim'
+Plugin 'ferrine/md-img-paste.vim'
 ```
 
 ## Usage
@@ -46,15 +55,49 @@ autocmd FileType markdown,tex nmap <buffer><silent> <leader>p :call mdip#Markdow
                         '----'
 ```
 
+### Asciidoctor
+
+For [Asciidoctor](https://asciidoctor.org/), something like this should get you started:
+
+```viml
+""
+" Paste image inside an `.adoc` (Asciidoc[tor]) document.
+"
+"   image::./img/<name.png>[Image description]
+"
+function! g:AsciidocPasteImage(relpath)
+    execute "normal! iimage::./" . a:relpath . "[I"
+    let ipos = getcurpos()
+    execute "normal! a" . "mage description]"
+    call setpos('.', ipos)
+    execute "normal! vi[\<C-g>"
+endfunction
+
+""
+" Set `AsciidocPastImage` as the paste function for Asciidoc
+" (or Asciidoctor) buffers.
+"
+autocmd FileType asciidoctor
+      \ let g:PasteImageFunction = 'g:AsciidocPasteImage'
+
+""
+" Type <Leader>p to paste the image.
+"
+autocmd FileType asciidoctor
+      \ nmap <buffer><silent> <leader>p
+      \ :call mdip#MarkdownClipboardImage()<CR>
+```
+
 | Filetype | Function name | Content |
 |----------|---------------|---------|
 | Markdown | MarkdownPasteImage | `![Image](path)` |
 | Latex | LatexPasteImage | `\includegraphics{path} \caption{Image}` |
+| Asciidoc | AsciidocPasteImage | `image::./path[Image]` |
 | N/A  | EmptyPasteImage | `path` |
 
 PRs welcome
 
-### For linux user
+### For Linux user
 This plugin gets clipboard content by running the `xclip` command.
 
 install `xclip` first.
