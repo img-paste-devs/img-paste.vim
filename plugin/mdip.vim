@@ -237,8 +237,7 @@ function! mdip#MarkdownClipboardImage()
     else
         " let relpath = s:SaveNewFile(g:mdip_imgdir, tmpfile)
         let extension = split(tmpfile, '\.')[-1]
-        let sep = has('win32') ? '\' : '/'
-        let relpath = g:mdip_imgdir_intext . sep . g:mdip_tmpname . '.' . extension
+        let relpath = g:mdip_imgdir_intext . '/' . g:mdip_tmpname . '.' . extension
         if call(get(g:, 'PasteImageFunction'), [relpath])
             return
         endif
