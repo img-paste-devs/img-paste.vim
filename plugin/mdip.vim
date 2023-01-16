@@ -89,6 +89,11 @@ function! s:SaveFileTMPLinux(imgdir, tmpname) abort
 endfunction
 
 function! s:SaveFileTMPWin32(imgdir, tmpname) abort
+    let shell_bak = &shell
+    let shellcmdflag_bak = &shellcmdflag
+    let &shell = 'cmd.exe'
+    let &shellcmdflag = '/s /c'
+
     let tmpfile = a:imgdir . '\' . a:tmpname . '.png'
     let tmpfile = substitute(tmpfile, '\\ ', ' ', 'g')
 
@@ -99,6 +104,10 @@ function! s:SaveFileTMPWin32(imgdir, tmpname) abort
     let clip_command = "powershell -nologo -noprofile -noninteractive -sta \"".clip_command. "\""
 
     silent call system(clip_command)
+
+    let &shell = shell_bak
+    let &shellcmdflag = shellcmdflag_bak
+
     if v:shell_error == 1
         return 1
     else
@@ -194,7 +203,7 @@ function! g:LatexPasteImage(relpath)
 endfunction
 
 function! g:EmptyPasteImage(relpath)
-    execute "normal! i" . a:relpath 
+    execute "normal! i" . a:relpath
 endfunction
 
 let g:PasteImageFunction = 'g:MarkdownPasteImage'
