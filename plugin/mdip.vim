@@ -31,9 +31,9 @@ function! s:SaveFileTMPWSL(imgdir, tmpname) abort
     let tmpfile = a:imgdir . '/' . a:tmpname . '.png'
     let tmpfile = substitute(tmpfile, "\/", "\\\\\\", "g")
     if tmpfile =~ "mnt"
-        let tmpfile = substitute(tmpfile, "\\\\\\\\mnt\\\\\\\\c", "C:", "g")
+        let tmpfile = substitute(tmpfile, '\\\\mnt\\\\\(.\)', '\1:', "g")
     else
-        let tmpfile = '\\\\wsl\$\\Ubuntu'.tmpfile
+        let tmpfile = g:mdip_wsl_path.tmpfile
     endif
 
     let clip_command = 'powershell.exe -nologo -noprofile -noninteractive -sta "Add-Type -Assembly PresentationCore;'.
@@ -251,4 +251,8 @@ if !exists('g:mdip_tmpname')
 endif
 if !exists('g:mdip_imgname')
     let g:mdip_imgname = 'image'
+endif
+
+if !exists('g:mdip_wsl_path')
+    let g:mdip_wsl_path = '\\\\wsl\$\\Ubuntu'
 endif
