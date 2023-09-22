@@ -59,6 +59,13 @@ This plugin gets clipboard content by running the `xclip` command.
 
 install `xclip` first.
 
+### For WSL user
+
+Set your WSL path in .vimrc (you can check your WSL path from Windows File Explorer)
+```
+let g:mdip_wsl_path = '\\\\wsl.localhost\\Ubuntu-22.04'
+```
+
 ## Acknowledgements
 I'm not yet perfect at writing vim plugins but I managed to do it. Thanks to [Karl Yngve Lervåg](https://vi.stackexchange.com/users/21/karl-yngve-lerv%C3%A5g) and [Rich](https://vi.stackexchange.com/users/343/rich) for help on [vi.stackexchange.com](https://vi.stackexchange.com/questions/14114/paste-link-to-image-in-clipboard-when-editing-markdown) where they proposed a solution for my use case.
 
